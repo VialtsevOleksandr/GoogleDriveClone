@@ -1,0 +1,166 @@
+/* SVG Icons Styles для Gaming Drive */
+
+.svg-icon {
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+/* Розміри іконок */
+.svg-icon.icon-xs {
+    width: 16px;
+    height: 16px;
+}
+
+.svg-icon.icon-sm {
+    width: 20px;
+    height: 20px;
+}
+
+.svg-icon.icon-md {
+    width: 24px;
+    height: 24px;
+}
+
+.svg-icon.icon-lg {
+    width: 32px;
+    height: 32px;
+}
+
+.svg-icon.icon-xl {
+    width: 48px;
+    height: 48px;
+}
+
+/* Кольори іконок */
+.svg-icon.icon-primary {
+    color: var(--gaming-primary);
+}
+
+.svg-icon.icon-secondary {
+    color: var(--gaming-secondary);
+}
+
+.svg-icon.icon-success {
+    color: var(--gaming-success);
+}
+
+.svg-icon.icon-error {
+    color: var(--gaming-error);
+}
+
+.svg-icon.icon-warning {
+    color: var(--gaming-warning);
+}
+
+.svg-icon.icon-info {
+    color: var(--gaming-info);
+}
+
+.svg-icon.icon-white {
+    color: #ffffff;
+}
+
+.svg-icon.icon-muted {
+    color: #6B7280;
+}
+
+/* Інтерактивні ефекти */
+.svg-icon.icon-hover:hover {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+}
+
+.svg-icon.icon-clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.svg-icon.icon-clickable:hover {
+    transform: scale(1.05);
+}
+
+.svg-icon.icon-clickable:active {
+    transform: scale(0.95);
+}
+
+/* Анімації */
+.svg-icon.icon-spin {
+    animation: icon-spin 1s linear infinite;
+}
+
+.svg-icon.icon-pulse {
+    animation: icon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes icon-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes icon-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Gaming специфічні стилі */
+.svg-icon.gaming-glow {
+    filter: drop-shadow(0 0 4px currentColor);
+}
+
+.svg-icon.gaming-neon {
+    filter: 
+        drop-shadow(0 0 2px currentColor)
+        drop-shadow(0 0 4px currentColor)
+        drop-shadow(0 0 8px currentColor);
+}
+
+/* Контекстні стилі для кнопок */
+.pixel-btn .svg-icon {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.pixel-btn.icon-only .svg-icon {
+    margin: 0;
+}
+
+/* Стилі для навігації */
+.gaming-header .svg-icon {
+    margin-right: 6px;
+}
+
+/* Стилі для файл менеджера */
+.file-item .svg-icon {
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.file-actions .svg-icon {
+    margin: 0 4px;
+}
+
+/* Статуси в нотифікаціях */
+.gaming-notification .svg-icon {
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+/* Search box positioning */
+.search-box {
+    position: relative;
+    display: inline-block;
+}
+
+.search-input {
+    padding-left: 40px !important;
+}

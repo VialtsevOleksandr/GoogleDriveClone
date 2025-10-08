@@ -1,0 +1,399 @@
+/* Gaming Home Page Styles */
+
+.gaming-welcome-container, .gaming-auth-container {
+    min-height: 100vh;
+    padding: 20px 20px; /* «меншено з 40px */
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--accent-purple) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Welcome Hero Section */
+.welcome-hero, .auth-hero {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-icon, .logo-icon {
+    font-size: 80px;
+    margin-bottom: 12px; /* «меншено з 20px */
+    display: block;
+    animation: float 3s ease-in-out infinite;
+}
+
+.welcome-hero h1, .auth-hero h1 {
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--text-primary);
+    margin: 0 0 12px; /* «меншено з 16px */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: 2px;
+}
+
+.welcome-hero p {
+    font-size: 20px; /* «б≥льшено з базового розм≥ру */
+    color: var(--text-secondary);
+    margin: 12px 0;
+    font-weight: 500;
+}
+
+.player-name {
+    color: var(--primary-purple);
+    font-weight: 900;
+    text-shadow: 1px 1px 2px rgba(139, 92, 246, 0.3);
+}
+
+.hero-subtitle, .logo-subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin: 12px 0 24px; /* «меншено з 16px 0 32px */
+    font-weight: 600;
+}
+
+.hero-actions, .auth-actions {
+    display: flex;
+    gap: 16px; /* «меншено з 20px */
+    justify-content: center;
+    margin: 20px 0; /* «меншено з 32px */
+    flex-wrap: wrap;
+}
+
+/* ѕокращен≥ стил≥ дл€ hero кнопок */
+.hero-btn {
+    font-size: 16px;
+    padding: 14px 28px;
+    min-width: 160px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.hero-btn.pixel-btn-primary {
+    border-color: var(--primary-purple);
+    color: #FFFFFF;
+    background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
+}
+
+.hero-btn.pixel-btn-primary:hover {
+    background: linear-gradient(45deg, var(--secondary-purple), var(--primary-purple));
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    transform: translateY(-2px);
+    color: #FFFFFF;
+}
+
+.hero-btn.pixel-btn-secondary {
+    border-color: var(--accent-cyan);
+    color: #000000;
+    background: linear-gradient(45deg, var(--accent-cyan), #1a73e8);
+}
+
+.hero-btn.pixel-btn-secondary:hover {
+    background: linear-gradient(45deg, #1a73e8, var(--accent-cyan));
+    box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
+    transform: translateY(-2px);
+    color: #000000;
+}
+
+/* јн≥мац≥€ дл€ hero кнопок */
+.hero-btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+}
+
+.hero-btn:hover:before {
+    left: 100%;
+}
+
+/* ÷ентруванн€ ≥конок в кнопках */
+.hero-btn svg, .auth-btn svg {
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.auth-btn {
+    font-size: 16px;
+    padding: 14px 28px; /* «меншено з 16px 32px */
+    min-width: 160px; /* «меншено з 180px */
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Logo Section */
+.hero-logo {
+    margin-bottom: 20px; /* «меншено з 40px */
+    padding: 20px; /* «меншено з 40px */
+    background: var(--bg-card);
+    border: var(--pixel-border) solid var(--primary-purple);
+    clip-path: polygon(20px 0%, 100% 0%, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%, 0% 20px);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+}
+
+.hero-logo:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary-purple), var(--secondary-purple), var(--primary-purple));
+    clip-path: polygon(20px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 20px);
+}
+
+/* Features Grid */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px; /* «меншено з 24px */
+    margin: 24px 0; /* «меншено з 32px */
+}
+
+.feature-item {
+    background: var(--bg-card);
+    padding: 24px;
+    border: 2px solid var(--border-color);
+    text-align: center;
+    transition: all 0.3s ease;
+    clip-path: polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px);
+    position: relative;
+}
+
+.feature-item:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary-purple);
+    box-shadow: var(--shadow-purple);
+}
+
+.feature-item:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-purple), var(--secondary-purple));
+    clip-path: polygon(12px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 12px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.feature-item:hover:before {
+    opacity: 1;
+}
+
+.feature-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.feature-item h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 8px;
+}
+
+.feature-item p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Stats Panel */
+.stats-panel {
+    background: var(--bg-card);
+    border: var(--pixel-border) solid var(--primary-purple);
+    padding: 20px; /* «меншено з 24px */
+    margin-top: 24px; /* «меншено з 32px */
+    max-width: 600px;
+    width: 100%;
+    clip-path: polygon(16px 0%, 100% 0%, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0% 100%, 0% 16px);
+    box-shadow: var(--shadow-lg);
+    animation: slideIn 0.5s ease-out;
+}
+
+.stats-panel h3 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--pixel-radius);
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    border-color: var(--primary-purple);
+    transform: scale(1.05);
+}
+
+.stat-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--primary-purple);
+}
+
+.stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Auth Description */
+.auth-description {
+    margin: 24px 0; /* «меншено з 40px */
+}
+
+.auth-description h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 24px;
+    text-align: center;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .gaming-welcome-container, .gaming-auth-container {
+        padding: 16px 12px; /* «меншено в≥дступи */
+    }
+    
+    .welcome-hero h1, .auth-hero h1 {
+        font-size: 32px; /* «меншено з 36px */
+    }
+    
+    .hero-icon, .logo-icon {
+        font-size: 52px; /* «меншено з 60px */
+        margin-bottom: 12px;
+    }
+    
+    .hero-actions, .auth-actions {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .hero-btn, .auth-btn {
+        width: 100%;
+        max-width: 260px; /* «меншено з 280px */
+        padding: 12px 24px;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .hero-logo {
+        padding: 20px; /* «меншено з 24px */
+        margin-bottom: 20px; /* «меншено з 24px */
+    }
+    
+    .auth-description {
+        margin: 24px 0; /* «меншено з 40px */
+    }
+    
+    .auth-description h2 {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gaming-welcome-container, .gaming-auth-container {
+        padding: 12px 8px;
+    }
+    
+    .welcome-hero h1, .auth-hero h1 {
+        font-size: 26px; /* «меншено з 28px */
+    }
+    
+    .hero-icon, .logo-icon {
+        font-size: 44px; /* «меншено з 48px */
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-item {
+        padding: 12px;
+    }
+    
+    .feature-item {
+        padding: 16px;
+    }
+    
+    .hero-logo {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+}

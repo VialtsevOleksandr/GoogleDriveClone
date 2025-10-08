@@ -1,0 +1,101 @@
+@page "/login"
+@using GoogleDriveClone.Shared.Interfaces
+@using GoogleDriveClone.SharedModels.DTOs
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager Navigation
+
+<PageTitle>Вхід - Gaming Drive</PageTitle>
+
+<div class="auth-container">
+    <div class="floating-elements"></div>
+    
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">
+                <SvgIcon Type="IconType.GameController" Size="48px" CssClass="gaming-neon" />
+            </div>
+            <h2 class="auth-title">Вхід до системи</h2>
+            <p class="auth-subtitle">Введіть свої дані для продовження</p>
+        </div>
+        
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="message message-error">
+                <SvgIcon Type="IconType.Error" Size="20px" />
+                @errorMessage
+            </div>
+        }
+
+        <EditForm Model="loginModel" OnValidSubmit="HandleLogin" class="auth-form">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label class="form-label" for="email">Електронна пошта</label>
+                <InputText id="email" class="form-input pixel-input" 
+                          placeholder="example@email.com" 
+                          @bind-Value="loginModel.Email" />
+                <ValidationMessage For="@(() => loginModel.Email)" class="validation-error" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Пароль</label>
+                <InputText id="password" type="password" class="form-input pixel-input" 
+                          placeholder="Введіть ваш пароль" 
+                          @bind-Value="loginModel.Password" />
+                <ValidationMessage For="@(() => loginModel.Password)" class="validation-error" />
+            </div>
+
+            <button type="submit" class="auth-submit @(isLoading ? "loading" : "")" disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <SvgIcon Type="IconType.Loading" Size="20px" CssClass="icon-spin" />
+                    <text>Входимо...</text>
+                }
+                else
+                {
+                    <SvgIcon Type="IconType.Login" Size="20px" />
+                    <text>Увійти</text>
+                }
+            </button>
+        </EditForm>
+
+        <div class="auth-links">
+            <p>Немає акаунта? <a href="/register" class="auth-link">Зареєструватися</a></p>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginDto loginModel = new();
+    private string errorMessage = string.Empty;
+    private bool isLoading = false;
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = string.Empty;
+
+            var result = await AuthenticationService.LoginAsync(loginModel);
+
+            if (result.IsSuccess)
+            {
+                Navigation.NavigateTo("/files");
+            }
+            else
+            {
+                errorMessage = result.Error?.Message ?? "Помилка входу. Перевірте свої дані.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Сталася неочікувана помилка: " + ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

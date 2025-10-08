@@ -1,0 +1,194 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@using GoogleDriveClone.Shared.Interfaces
+@using GoogleDriveClone.SharedModels.DTOs
+@using System.Security.Claims
+@inject NavigationManager Navigation
+@inject IUserStatsService UserStatsService
+
+<PageTitle>Gaming Drive - Cloud Storage</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="gaming-welcome-container">
+            <div class="welcome-hero">
+                <h1>Вітаємо в Gaming Drive!</h1>
+                <p>Привіт, <strong class="player-name">@GetUserName(context)</strong>!</p>
+                <p class="hero-subtitle">Ваші файли чекають на вас. Готові керувати ними?</p>
+                
+                <div class="hero-actions">
+                    <a href="/files" class="pixel-btn pixel-btn-primary hero-btn">
+                        <SvgIcon Type="IconType.Folder" Size="20px" Color="#FFFFFF" />
+                        Переглянути файли
+                    </a>
+                    <button class="pixel-btn pixel-btn-secondary hero-btn" @onclick="ShowStats">
+                        <SvgIcon Type="IconType.Stats" Size="20px" Color="#000000" />
+                        Показати статистику
+                    </button>
+                </div>
+            </div>
+
+            @if (showStats)
+            {
+                <div class="stats-panel">
+                    <h3>Статистика використання</h3>
+                    
+                    @if (isLoadingStats)
+                    {
+                        <div class="loading-stats">
+                            <SvgIcon Type="IconType.Loading" Size="24px" CssClass="icon-spin" />
+                            <p>Завантаження статистики...</p>
+                        </div>
+                    }
+                    else if (userStats != null)
+                    {
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <SvgIcon Type="IconType.Folder" Size="32px" CssClass="gaming-glow" />
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-value">@userStats.TotalFiles</span>
+                                    <span class="stat-label">Файлів збережено</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <SvgIcon Type="IconType.Cloud" Size="32px" CssClass="gaming-glow" />
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-value">@userStats.FormattedSize</span>
+                                    <span class="stat-label">Використано місця</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="stats-error">
+                            <SvgIcon Type="IconType.Error" Size="24px" />
+                            <p>Не вдалося завантажити статистику</p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </Authorized>
+    
+    <NotAuthorized>
+        <div class="gaming-auth-container">
+            <div class="auth-hero">
+                <div class="hero-logo">
+                    <div class="logo-icon">
+                        <SvgIcon Type="IconType.GameController" Size="48px" CssClass="gaming-neon" />
+                    </div>
+                    <h1>Gaming Drive</h1>
+                    <p class="logo-subtitle">Сучасне хмарне сховище для ваших файлів</p>
+                </div>
+                
+                <div class="auth-description">
+                    <h2>Зберігайте, синхронізуйте та діліться файлами</h2>
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <SvgIcon Type="IconType.Rocket" Size="40px" Color="#00D9FF" />
+                            </div>
+                            <h4>Швидке завантаження</h4>
+                            <p>Завантажуйте та отримуйте доступ до файлів без затримок</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <SvgIcon Type="IconType.Lock" Size="40px" Color="#00D9FF" />
+                            </div>
+                            <h4>Надійна безпека</h4>
+                            <p>Ваші файли захищені сучасними методами шифрування</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <SvgIcon Type="IconType.Target" Size="40px" Color="#00D9FF" />
+                            </div>
+                            <h4>Зручна організація</h4>
+                            <p>Знаходьте потрібні файли за допомогою пошуку та фільтрів</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <SvgIcon Type="IconType.Globe" Size="40px" Color="#00D9FF" />
+                            </div>
+                            <h4>Доступ з будь-якого пристрою</h4>
+                            <p>Використовуйте свої файли на комп'ютері, телефоні чи планшеті</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="auth-actions">
+                    <a href="/login" class="pixel-btn pixel-btn-primary hero-btn">Увійти в систему</a>
+                    <a href="/register" class="pixel-btn pixel-btn-secondary hero-btn">Створити акаунт</a>
+                </div>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private bool showStats = false;
+    private bool isLoadingStats = false;
+    private UserStatsDto? userStats = null;
+
+    private string GetUserName(AuthenticationState authState)
+    {
+        var user = authState.User;
+        
+        // JWT токени використовують скорочені імена claims
+        var userName = user.FindFirst("unique_name")?.Value                                               // JWT стандартний claim для username
+                    ?? user.FindFirst("name")?.Value                                                       // альтернативний варіант  
+                    ?? user.FindFirst(ClaimTypes.Name)?.Value                                             // стандартний ClaimTypes.Name
+                    ?? user.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value // повний URI для Name
+                    ?? user.FindFirst("username")?.Value                                                   // альтернативний варіант
+                    ?? user.FindFirst("email")?.Value                                                      // email як fallback
+                    ?? user.FindFirst(ClaimTypes.Email)?.Value                                            // стандартний ClaimTypes.Email
+                    ?? user.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value // повний URI для Email
+                    ?? "Користувач";
+        
+        // Якщо це email, показуємо тільки частину до @
+        if (userName.Contains("@"))
+        {
+            userName = userName.Split('@')[0];
+        }
+        
+        return userName;
+    }
+
+    private async Task ShowStats()
+    {
+        showStats = !showStats;
+        
+        if (showStats && userStats == null)
+        {
+            await LoadUserStats();
+        }
+    }
+
+    private async Task LoadUserStats()
+    {
+        isLoadingStats = true;
+        
+        try
+        {
+            var result = await UserStatsService.GetUserStatsAsync();
+            
+            if (result.IsSuccess)
+            {
+                userStats = result.Value;
+            }
+            else
+            {
+                userStats = null;
+            }
+        }
+        finally
+        {
+            isLoadingStats = false;
+            StateHasChanged();
+        }
+    }
+}

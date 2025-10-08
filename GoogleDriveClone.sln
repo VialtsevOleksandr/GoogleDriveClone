@@ -1,0 +1,48 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36429.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleDriveClone.Shared", "GoogleDriveClone.Shared\GoogleDriveClone.Shared.csproj", "{A45B060B-FC2D-4CBB-9A4C-69ACE901D82B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleDriveClone.Web", "GoogleDriveClone.Web\GoogleDriveClone.Web.csproj", "{72CF4056-C1B3-43BA-8A66-A7D461CD8B0E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleDriveClone.MAUI", "GoogleDriveClone\GoogleDriveClone.MAUI.csproj", "{50C42AFD-4A86-8F68-FE47-88B506E9F2B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleDriveClone.Api", "GoogleDriveClone.Api\GoogleDriveClone.Api.csproj", "{CC74EDB2-B725-49AD-A25F-ECEE468AA6FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleDriveClone.SharedModels", "GoogleDriveClone._Shared\GoogleDriveClone.SharedModels.csproj", "{CC43B769-9D24-4D55-AF5C-EB1273D9F7CB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A45B060B-FC2D-4CBB-9A4C-69ACE901D82B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A45B060B-FC2D-4CBB-9A4C-69ACE901D82B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A45B060B-FC2D-4CBB-9A4C-69ACE901D82B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A45B060B-FC2D-4CBB-9A4C-69ACE901D82B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72CF4056-C1B3-43BA-8A66-A7D461CD8B0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72CF4056-C1B3-43BA-8A66-A7D461CD8B0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72CF4056-C1B3-43BA-8A66-A7D461CD8B0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72CF4056-C1B3-43BA-8A66-A7D461CD8B0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50C42AFD-4A86-8F68-FE47-88B506E9F2B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50C42AFD-4A86-8F68-FE47-88B506E9F2B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50C42AFD-4A86-8F68-FE47-88B506E9F2B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50C42AFD-4A86-8F68-FE47-88B506E9F2B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC74EDB2-B725-49AD-A25F-ECEE468AA6FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC74EDB2-B725-49AD-A25F-ECEE468AA6FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC74EDB2-B725-49AD-A25F-ECEE468AA6FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC74EDB2-B725-49AD-A25F-ECEE468AA6FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC43B769-9D24-4D55-AF5C-EB1273D9F7CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC43B769-9D24-4D55-AF5C-EB1273D9F7CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC43B769-9D24-4D55-AF5C-EB1273D9F7CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC43B769-9D24-4D55-AF5C-EB1273D9F7CB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3B99E3A8-4FEA-460F-BE39-3DDD8DE42646}
+	EndGlobalSection
+EndGlobal

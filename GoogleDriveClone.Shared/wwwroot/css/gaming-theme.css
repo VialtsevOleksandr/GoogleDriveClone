@@ -1,0 +1,315 @@
+/* Gaming Theme - Pixel Style with Purple Accents */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+    /* Purple Gaming Palette */
+    --primary-purple: #8B5CF6;
+    --secondary-purple: #A78BFA;
+    --dark-purple: #6D28D9;
+    --light-purple: #C4B5FD;
+    --accent-purple: #DDD6FE;
+    
+    /* Light theme colors */
+    --bg-primary: #F8FAFC;
+    --bg-secondary: #F1F5F9;
+    --bg-card: #FFFFFF;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --border-color: #E2E8F0;
+    
+    /* Gaming UI colors */
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
+    --danger-color: #EF4444;
+    --info-color: #3B82F6;
+    
+    /* Shadows and effects */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-purple: 0 4px 14px 0 rgba(139, 92, 246, 0.39);
+    
+    /* Pixel sizes */
+    --pixel-border: 3px;
+    --pixel-radius: 8px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Orbitron', monospace;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* Pixel Button Style */
+.pixel-btn {
+    position: relative;
+    padding: 12px 24px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: var(--pixel-border) solid;
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+}
+
+.pixel-btn:before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
+    z-index: -1;
+    clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+}
+
+.pixel-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-purple);
+    animation: pixel-glow 0.3s ease;
+}
+
+.pixel-btn:active {
+    transform: translateY(0);
+}
+
+/* Primary button variant */
+.pixel-btn-primary {
+    background: var(--primary-purple);
+    color: white;
+    border-color: var(--dark-purple);
+}
+
+.pixel-btn-primary:hover {
+    background: var(--secondary-purple);
+}
+
+/* Secondary button variant */
+.pixel-btn-secondary {
+    background: var(--bg-card);
+    color: var(--primary-purple);
+    border-color: var(--primary-purple);
+}
+
+.pixel-btn-secondary:hover {
+    background: var(--accent-purple);
+}
+
+/* File Card Style */
+.file-card {
+    background: var(--bg-card);
+    border: var(--pixel-border) solid var(--border-color);
+    padding: 20px;
+    margin: 10px;
+    position: relative;
+    transition: all 0.3s ease;
+    clip-path: polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px);
+    box-shadow: var(--shadow-sm);
+}
+
+.file-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-purple);
+}
+
+.file-card:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-purple), var(--secondary-purple), var(--primary-purple));
+    clip-path: polygon(12px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 12px);
+}
+
+/* File type icons */
+.file-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 12px;
+    background: var(--accent-purple);
+    clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+}
+
+/* Input fields */
+.pixel-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    border: var(--pixel-border) solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+}
+
+.pixel-input:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+    box-shadow: var(--shadow-purple);
+}
+
+/* Navigation pills */
+.nav-pills {
+    display: flex;
+    gap: 8px;
+    background: var(--bg-secondary);
+    padding: 8px;
+    border-radius: var(--pixel-radius);
+    border: 2px solid var(--border-color);
+}
+
+.nav-pill {
+    padding: 8px 16px;
+    font-family: 'Orbitron', monospace;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    clip-path: polygon(4px 0%, 100% 0%, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0% 100%, 0% 4px);
+}
+
+.nav-pill.active,
+.nav-pill:hover {
+    background: var(--primary-purple);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Status indicators */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    clip-path: polygon(4px 0%, 100% 0%, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0% 100%, 0% 4px);
+}
+
+.status-synced {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+}
+
+.status-syncing {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning-color);
+    border: 1px solid var(--warning-color);
+}
+
+.status-syncing .status-icon {
+    animation: spin 1s linear infinite;
+}
+
+/* Animations */
+@keyframes pixel-glow {
+    0% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.5); }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .pixel-btn {
+        padding: 10px 16px;
+        font-size: 12px;
+    }
+    
+    .file-card {
+        margin: 8px;
+        padding: 16px;
+    }
+    
+    .nav-pills {
+        flex-wrap: wrap;
+    }
+}
+
+/* Grid layouts */
+.files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    padding: 20px;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border-bottom: 2px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.search-box {
+    flex: 1;
+    min-width: 200px;
+    max-width: 400px;
+}
+
+/* Loading states */
+.loading-skeleton {
+    background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--accent-purple) 50%, var(--bg-secondary) 75%);
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Trash styling */
+.file-card.trash {
+    opacity: 0.6;
+    background: var(--bg-secondary);
+    border-style: dashed;
+}
+
+.file-card.trash:before {
+    background: linear-gradient(90deg, var(--text-secondary), var(--border-color));
+}

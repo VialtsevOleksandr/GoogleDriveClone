@@ -1,0 +1,104 @@
+﻿@inherits LayoutComponentBase
+@using GoogleDriveClone.Shared.Interfaces
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager Navigation
+
+<div class="page">
+    <CascadingAuthenticationState>
+        <AuthorizeView>
+            <Authorized>
+                @if (ShouldShowHeader())
+                {
+                    <!-- Clean Header -->
+                    <header class="clean-header">
+                        <div class="header-brand">
+                            <SvgIcon Type="IconType.GameController" Size="28px" CssClass="brand-icon" />
+                            <h1>Gaming Drive</h1>
+                        </div>
+                        
+                        <div class="header-actions">
+                            <div class="user-info">
+                                <SvgIcon Type="IconType.User" Size="20px" />
+                                <span class="username">@GetUserName(context)</span>
+                            </div>
+                            <button class="header-logout-btn" @onclick="Logout">
+                                <SvgIcon Type="IconType.Logout" Size="16px" />
+                                Вийти
+                            </button>
+                        </div>
+                    </header>
+                }
+                <div class="main-content @(ShouldShowHeader() ? "with-header" : "")">
+                    @Body
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="main-content">
+                    @Body
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+    </CascadingAuthenticationState>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    <div class="error-container">
+        <div class="error-icon">
+            <SvgIcon Type="IconType.Error" Size="32px" Color="#FF4444" />
+        </div>
+        <div class="error-message">
+            <h3>Помилка гри!</h3>
+            <p>Сталася необроблена помилка.</p>
+        </div>
+        <div class="error-actions">
+            <button class="pixel-btn pixel-btn-primary" onclick="location.reload()">
+                <SvgIcon Type="IconType.Sync" Size="16px" />
+                Перезавантажити
+            </button>
+            <button class="pixel-btn pixel-btn-secondary dismiss" onclick="document.getElementById('blazor-error-ui').style.display='none'">
+                <SvgIcon Type="IconType.Close" Size="16px" />
+                Закрити
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private async Task Logout()
+    {
+        await AuthenticationService.LogoutAsync();
+        Navigation.NavigateTo("/");
+    }
+
+    private bool ShouldShowHeader()
+    {
+        var currentPath = Navigation.ToBaseRelativePath(Navigation.Uri);
+        return !string.IsNullOrEmpty(currentPath) && 
+               currentPath != "" && 
+               !currentPath.StartsWith("login") && 
+               !currentPath.StartsWith("register");
+    }
+    
+    private string GetUserName(AuthenticationState authState)
+    {
+        var user = authState.User;
+        
+        // JWT токени використовують скорочені імена claims
+        var userName = user.FindFirst("unique_name")?.Value                                               // JWT стандартний claim для username
+                    ?? user.FindFirst("name")?.Value                                                       // альтернативний варіант  
+                    ?? user.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value // повний URI для Name
+                    ?? user.FindFirst("username")?.Value                                                   // альтернативний варіант
+                    ?? user.FindFirst("email")?.Value                                                      // email як fallback
+                    ?? user.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value // повний URI для Email
+                    ?? "Користувач";
+        
+        // Якщо це email, показуємо тільки частину до @
+        if (userName.Contains("@"))
+        {
+            userName = userName.Split('@')[0];
+        }
+        
+        return userName;
+    }
+}

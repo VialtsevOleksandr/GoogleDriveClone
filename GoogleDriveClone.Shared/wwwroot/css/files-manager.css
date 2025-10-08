@@ -1,0 +1,798 @@
+/* Files Workspace - Enhanced Design with Bigger Icons & Colorful Badges */
+
+/* Імпорт сучасного шрифту */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+.files-workspace {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #0f172a;
+}
+
+/* Головна панель інструментів */
+.workspace-toolbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid #e2e8f0;
+    padding: 18px 28px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 28px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Зона пошуку */
+.search-zone {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.search-container {
+    position: relative;
+    max-width: 360px;
+    width: 100%;
+}
+
+.search-field {
+    width: 100%;
+    padding: 12px 18px 12px 46px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #f8fafc;
+    font-size: 15px;
+    font-weight: 400;
+    color: #334155;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-field:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+}
+
+/* Центральна зона статистики */
+.stats-zone {
+    display: flex;
+    justify-content: center;
+}
+
+.files-count {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    border-radius: 24px;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+}
+
+.count-number {
+    font-size: 20px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.count-label {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+/* Зона дій */
+.actions-zone {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 18px;
+}
+
+.filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-select {
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 130px;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.control-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.control-button:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #475569;
+    transform: translateY(-1px);
+}
+
+.control-button.active {
+    background: #8b5cf6;
+    border-color: #8b5cf6;
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sync-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sync-button:hover:not(:disabled) {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #475569;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sync-button.syncing {
+    color: #8b5cf6;
+    border-color: #8b5cf6;
+}
+
+.sync-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.upload-zone {
+    position: relative;
+}
+
+.upload-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.upload-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    box-shadow: 0 3px 10px rgba(139, 92, 246, 0.3);
+}
+
+.upload-button:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+/* Робочий простір */
+.workspace-content {
+    padding: 36px 28px;
+}
+
+.files-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
+}
+
+/* Плитки файлів - покращені */
+.file-tile {
+    background: white;
+    border: 1px solid #f1f5f9;
+    border-radius: 18px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    position: relative;
+}
+
+.file-tile:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    border-color: #e2e8f0;
+}
+
+.file-tile:hover .file-actions-overlay {
+    opacity: 1;
+}
+
+.tile-preview {
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.preview-icon {
+    transition: transform 0.3s ease;
+}
+
+.file-tile:hover .preview-icon {
+    transform: scale(1.15);
+}
+
+/* Кольори для типів файлів - покращені градієнти */
+.tile-preview.file-python {
+    background: linear-gradient(135deg, #306998, #4b8bbe);
+    color: white;
+}
+
+.tile-preview.file-c {
+    background: linear-gradient(135deg, #283593, #3949ab);
+    color: white;
+}
+
+.tile-preview.file-cpp {
+    background: linear-gradient(135deg, #004482, #0066cc);
+    color: white;
+}
+
+.tile-preview.file-csharp {
+    background: linear-gradient(135deg, #239120, #68b030);
+    color: white;
+}
+
+.tile-preview.file-javascript {
+    background: linear-gradient(135deg, #f7df1e, #f0db4f);
+    color: #323330;
+}
+
+.tile-preview.file-image {
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+    color: white;
+}
+
+.tile-preview.file-text {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+    color: white;
+}
+
+.tile-preview.file-pdf {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+}
+
+.tile-preview.file-archive {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: white;
+}
+
+.tile-preview.file-default {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+}
+
+/* Overlay з діями - більші кнопки */
+.file-actions-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.tile-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.view-action {
+    color: #059669;
+}
+
+.view-action:hover {
+    background: #059669;
+    color: white;
+    transform: scale(1.15);
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+}
+
+.download-action {
+    color: #0ea5e9;
+}
+
+.download-action:hover {
+    background: #0ea5e9;
+    color: white;
+    transform: scale(1.15);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+}
+
+.delete-action {
+    color: #dc2626;
+}
+
+.delete-action:hover {
+    background: #dc2626;
+    color: white;
+    transform: scale(1.15);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+}
+
+/* Інформація про файл */
+.tile-info {
+    padding: 18px;
+}
+
+.file-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+.file-details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.file-size {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Кольорові значки типів файлів */
+.file-type {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-python {
+    background: linear-gradient(135deg, #306998, #4b8bbe);
+    color: white;
+}
+
+.badge-c {
+    background: linear-gradient(135deg, #283593, #3949ab);
+    color: white;
+}
+
+.badge-cpp {
+    background: linear-gradient(135deg, #004482, #0066cc);
+    color: white;
+}
+
+.badge-csharp {
+    background: linear-gradient(135deg, #239120, #68b030);
+    color: white;
+}
+
+.badge-javascript {
+    background: linear-gradient(135deg, #f7df1e, #f0db4f);
+    color: #323330;
+}
+
+.badge-image {
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+    color: white;
+}
+
+.badge-text {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+    color: white;
+}
+
+.badge-pdf {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+}
+
+.badge-archive {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: white;
+}
+
+.badge-default {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+}
+
+.file-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.meta-row svg {
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.meta-label {
+    font-weight: 500;
+    color: #475569;
+    min-width: 60px;
+}
+
+.meta-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #64748b;
+}
+
+/* Empty State */
+.empty-workspace {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 20px;
+    text-align: center;
+    min-height: 400px;
+}
+
+.empty-illustration {
+    color: #cbd5e1;
+    margin-bottom: 28px;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+.empty-workspace h3 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 16px;
+}
+
+.empty-workspace p {
+    font-size: 16px;
+    color: #64748b;
+    margin: 0 0 36px;
+    max-width: 400px;
+    line-height: 1.6;
+}
+
+.quick-upload {
+    position: relative;
+}
+
+.quick-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 36px;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+}
+
+.quick-upload-btn:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+}
+
+/* Skeleton Loading */
+.skeleton-tile {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeleton-shimmer {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+.skeleton-line {
+    height: 14px;
+    border-radius: 7px;
+    margin: 6px 0;
+}
+
+.skeleton-line.small {
+    height: 12px;
+    width: 60%;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* File Viewer Modal */
+.file-viewer-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+}
+
+.file-viewer-window {
+    background: white;
+    border-radius: 18px;
+    max-width: 650px;
+    width: 100%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.viewer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+
+.viewer-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.viewer-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.viewer-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: #f1f5f9;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.viewer-close:hover {
+    background: #e2e8f0;
+    color: #475569;
+    transform: scale(1.05);
+}
+
+.viewer-body {
+    padding: 44px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-notice {
+    text-align: center;
+    max-width: 380px;
+}
+
+.notice-icon {
+    color: #cbd5e1;
+    margin-bottom: 24px;
+}
+
+.preview-notice h4 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 16px;
+}
+
+.preview-notice p {
+    font-size: 15px;
+    color: #64748b;
+    margin: 0 0 10px;
+    line-height: 1.6;
+}
+
+.preview-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 24px;
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+}
+
+.preview-download:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .files-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+}
+
+@media (max-width: 1024px) {
+    .workspace-toolbar {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 16px 20px;
+    }
+    
+    .search-zone, .stats-zone, .actions-zone {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .workspace-content {
+        padding: 24px 18px;
+    }
+    
+    .files-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 18px;
+    }
+    
+    .file-actions-overlay {
+        opacity: 1;
+    }
+    
+    .actions-zone {
+        flex-wrap: wrap;
+    }
+    
+    .filter-controls {
+        order: 2;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .files-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    
+    .tile-preview {
+        height: 120px;
+    }
+    
+    .file-actions-overlay {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .tile-action {
+        width: 38px;
+        height: 38px;
+    }
+}

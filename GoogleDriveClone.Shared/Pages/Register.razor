@@ -1,0 +1,117 @@
+@page "/register"
+@using GoogleDriveClone.Shared.Interfaces
+@using GoogleDriveClone.SharedModels.DTOs
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager Navigation
+
+<PageTitle>Реєстрація - Gaming Drive</PageTitle>
+
+<div class="auth-container">
+    <div class="floating-elements"></div>
+    
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">
+                <SvgIcon Type="IconType.GameController" Size="48px" CssClass="gaming-neon" />
+            </div>
+            <h2 class="auth-title">Реєстрація</h2>
+            <p class="auth-subtitle">Створіть ваш ігровий акаунт</p>
+        </div>
+        
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="message message-error">
+                <SvgIcon Type="IconType.Error" Size="20px" />
+                @errorMessage
+            </div>
+        }
+
+        <EditForm Model="registerModel" OnValidSubmit="HandleRegister" class="auth-form">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label class="form-label" for="username">Ім'я користувача</label>
+                <InputText id="username" class="form-input pixel-input" 
+                          placeholder="Оберіть ваше ім'я" 
+                          @bind-Value="registerModel.Username" />
+                <ValidationMessage For="@(() => registerModel.Username)" class="validation-error" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Електронна пошта</label>
+                <InputText id="email" class="form-input pixel-input" 
+                          placeholder="example@email.com" 
+                          @bind-Value="registerModel.Email" />
+                <ValidationMessage For="@(() => registerModel.Email)" class="validation-error" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Пароль</label>
+                <InputText id="password" type="password" class="form-input pixel-input" 
+                          placeholder="Створіть надійний пароль" 
+                          @bind-Value="registerModel.Password" />
+                <ValidationMessage For="@(() => registerModel.Password)" class="validation-error" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="confirmPassword">Підтвердження пароля</label>
+                <InputText id="confirmPassword" type="password" class="form-input pixel-input" 
+                          placeholder="Повторіть ваш пароль" 
+                          @bind-Value="registerModel.ConfirmPassword" />
+                <ValidationMessage For="@(() => registerModel.ConfirmPassword)" class="validation-error" />
+            </div>
+
+            <button type="submit" class="auth-submit @(isLoading ? "loading" : "")" disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <SvgIcon Type="IconType.Loading" Size="20px" CssClass="icon-spin" />
+                    <text>Створюємо акаунт...</text>
+                }
+                else
+                {
+                    <SvgIcon Type="IconType.User" Size="20px" />
+                    <text>Зареєструватися</text>
+                }
+            </button>
+        </EditForm>
+
+        <div class="auth-links">
+            <p>Вже є акаунт? <a href="/login" class="auth-link">Увійти</a></p>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterDto registerModel = new();
+    private string errorMessage = string.Empty;
+    private bool isLoading = false;
+
+    private async Task HandleRegister()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = string.Empty;
+
+            var result = await AuthenticationService.RegisterAsync(registerModel);
+
+            if (result.IsSuccess)
+            {
+                Navigation.NavigateTo("/files");
+            }
+            else
+            {
+                errorMessage = result.Error?.Message ?? "Помилка реєстрації. Спробуйте ще раз.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Сталася неочікувана помилка: " + ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
