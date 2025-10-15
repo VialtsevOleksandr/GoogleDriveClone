@@ -5,17 +5,32 @@
 @using GoogleDriveClone.SharedModels.Results
 @using GoogleDriveClone.Shared.Auth
 @using GoogleDriveClone.Shared.Services
+@using GoogleDriveClone.Shared.Utils
+@using GoogleDriveClone.Shared.Interfaces
+@using System.Text.Json
 @inject IFileManagerService FileManagerService
 @inject IFileUploadService FileUploadService
 @inject IFileDownloadService FileDownloadService
 @inject INotificationService NotificationService
 @inject IPreferencesService PreferencesService
+@inject ISyncService SyncService
+@inject IApiConfigService ApiConfigService
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Мій диск - Gaming Drive</PageTitle>
 
-<div class="files-workspace">
+<div class="files-workspace @(isDragOver ? "drag-over" : "")" @ref="dragDropZone">
+    <!-- Drag and Drop Overlay -->
+    <div class="drag-drop-overlay @(isDragOver ? "active" : "")">
+        <div class="drop-message">
+            <SvgIcon Type="IconType.Upload" Size="48px" />
+            <h3>Відпустіть файли для завантаження</h3>
+            <p>Файли будуть автоматично завантажені на сервер</p>
+            <p><small>Підтримуються зображення, документи, код та архіви до 50 МБ</small></p>
+        </div>
+    </div>
+
     <!-- Головна панель з пошуком та діями -->
     <div class="workspace-toolbar">
         <!-- Ліва частина: пошук -->
@@ -23,7 +38,7 @@
             <div class="search-container">
                 <SvgIcon Type="IconType.Search" Size="16px" CssClass="search-icon" />
                 <input type="text" class="search-field" placeholder="Знайти файли..." 
-                       @bind="searchQuery" @oninput="FilterFiles" />
+                       @bind="searchQuery" @oninput="OnSearchInput" />
             </div>
         </div>
         
@@ -57,8 +72,9 @@
             </div>
             
             <div class="action-buttons">
-                <button class="sync-button @(isSyncing ? "syncing" : "")" @onclick="SyncFiles" disabled="@isSyncing" title="Синхронізувати">
+                <button class="sync-button @(isSyncing ? "syncing" : "")" @onclick="SyncWithFolder" disabled="@isSyncing" title="@(isSyncing ? "Синхронізація..." : "Синхронізувати з папкою")">
                     <SvgIcon Type="IconType.Sync" Size="18px" CssClass="@(isSyncing ? "icon-spin" : "")" />
+                    @(isSyncing ? "Синхронізація..." : "Синхронізувати")
                 </button>
                 
                 <div class="upload-zone">
@@ -73,7 +89,7 @@
     </div>
 
     <!-- Робочий простір з файлами -->
-    <div class="workspace-content">
+    <div class="workspace-content @(isDragOver ? "drag-over" : "")">
         @if (isLoading)
         {
             <div class="files-gallery">
@@ -96,9 +112,9 @@
                     <SvgIcon Type="IconType.Folder" Size="80px" />
                 </div>
                 <h3>@(searchQuery.Length > 0 ? "Нічого не знайдено" : "Ваш диск порожній")</h3>
-                <p>@(searchQuery.Length > 0 ? "Спробуйте змінити запит або фільтри" : "Завантажте перші файли для початку роботи")</p>
+                <p>@(searchQuery.Length > 0 ? "Спробуйте змінити запит або фільтри" : isDragOver ? "Відпустіть файли тут для миттєвого завантаження" : "Завантажте перші файли для початку роботи або просто перетягніть їх сюди")</p>
                 
-                @if (searchQuery.Length == 0)
+                @if (searchQuery.Length == 0 && !isDragOver)
                 {
                     <div class="quick-upload">
                         <InputFile OnChange="HandleFileUpload" class="upload-input" id="quickUpload" multiple />
@@ -127,12 +143,6 @@
                                         <SvgIcon Type="IconType.View" Size="18px" />
                                     </button>
                                 }
-                                @if (FileManagerService.CanEditFile(file.OriginalName))
-                                {
-                                    <button class="tile-action edit-action" @onclick="() => EditFile(file)" title="Редагувати файл">
-                                        <SvgIcon Type="IconType.Edit" Size="18px" />
-                                    </button>
-                                }
                                 <button class="tile-action download-action" @onclick="() => DownloadFile(file)" title="Завантажити файл">
                                     <SvgIcon Type="IconType.Download" Size="18px" />
                                 </button>
@@ -146,7 +156,7 @@
                             <h4 class="file-title" title="@file.OriginalName">@file.OriginalName</h4>
                             
                             <div class="file-details">
-                                <span class="file-size">@FormatFileSize(file.Size)</span>
+                                <span class="file-size">@FileUtils.FormatFileSize(file.Size)</span>
                                 <span class="file-type @GetFileTypeBadgeClass(file.OriginalName)">@GetFileExtension(file.OriginalName)</span>
                             </div>
                             
@@ -203,9 +213,6 @@
                             <button class="viewer-action save-btn" @onclick="SaveFile" disabled="@isSaving" title="Зберегти зміни">
                                 <SvgIcon Type="IconType.Save" Size="18px" CssClass="@(isSaving ? "icon-spin" : "")" />
                             </button>
-                            <button class="viewer-action cancel-btn" @onclick="CancelEdit" title="Скасувати">
-                                <SvgIcon Type="IconType.Close" Size="18px" />
-                            </button>
                         }
                         else
                         {
@@ -227,6 +234,24 @@
                             <p>Завантаження вмісту файлу...</p>
                         </div>
                     }
+                    else if (selectedFile != null && FileManagerService.IsImageFile(selectedFile.OriginalName) && !string.IsNullOrEmpty(fileDataUri))
+                    {
+                        <div class="image-preview">
+                            <div class="image-container">
+                                <img src="@fileDataUri" alt="@selectedFile.OriginalName" class="preview-image" />
+                            </div>
+                            <div class="image-info">
+                                <span class="image-filename">@selectedFile.OriginalName</span>
+                                <span class="image-size">@FileUtils.FormatFileSize(selectedFile.Size)</span>
+                            </div>
+                        </div>
+                    }
+                    else if (selectedFile != null && FileManagerService.IsPdfFile(selectedFile.OriginalName) && !string.IsNullOrEmpty(fileDataUri))
+                    {
+                        <div class="pdf-preview">
+                            <embed src="@fileDataUri" type="application/pdf" class="preview-pdf" />
+                        </div>
+                    }
                     else if (!string.IsNullOrEmpty(fileContent))
                     {
                         @if (isEditMode)
@@ -246,14 +271,14 @@
                             </div>
                         }
                     }
-                    else if (FileManagerService.CanPreviewFile(selectedFile.OriginalName))
+                    else if (selectedFile != null && FileManagerService.CanPreviewFile(selectedFile.OriginalName))
                     {
                         <div class="content-error">
                             <SvgIcon Type="IconType.Error" Size="48px" />
                             <h4>Помилка завантаження</h4>
                             <p>Не вдалося завантажити вміст файлу.</p>
                             <button class="retry-btn" @onclick="() => LoadFileContent(selectedFile.Id)">
-                                <SvgIcon Type="IconType.Sync" Size="16px" />
+                                
                                 Спробувати ще раз
                             </button>
                         </div>
@@ -268,10 +293,109 @@
                             <p>Цей тип файлу не підтримує перегляд.</p>
                             <p>Завантажте файл для відкриття на пристрої.</p>
                             
-                            <button class="preview-download" @onclick="() => DownloadFile(selectedFile)">
+                            <button class="preview-download" @onclick="() => DownloadFile(selectedFile!)">
                                 <SvgIcon Type="IconType.Download" Size="18px" />
                                 Завантажити файл
                             </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Модальне вікно результатів синхронізації -->
+    @if (showSyncResults && syncResult != null)
+    {
+        <div class="file-viewer-backdrop" @onclick="CloseSyncResults">
+            <div class="sync-results-window" @onclick:stopPropagation="true">
+                <div class="sync-header">
+                    <div class="sync-title">
+                        <SvgIcon Type="IconType.Sync" Size="24px" />
+                        <h3>Результати синхронізації</h3>
+                    </div>
+                    <button class="sync-close" @onclick="CloseSyncResults">
+                        <SvgIcon Type="IconType.Close" Size="18px" />
+                    </button>
+                </div>
+                
+                <div class="sync-content">
+                    <div class="sync-summary">
+                        <div class="summary-stats">
+                            <div class="stat-item success">
+                                <SvgIcon Type="IconType.Success" Size="20px" />
+                                <span class="stat-label">Успішно</span>
+                                <span class="stat-value">@syncResult.SuccessCount</span>
+                            </div>
+                            @if (syncResult.ErrorCount > 0)
+                            {
+                                <div class="stat-item error">
+                                    <SvgIcon Type="IconType.Error" Size="20px" />
+                                    <span class="stat-label">Помилки</span>
+                                    <span class="stat-value">@syncResult.ErrorCount</span>
+                                </div>
+                            }
+                            <div class="stat-item info">
+                                <SvgIcon Type="IconType.Info" Size="20px" />
+                                <span class="stat-label">Всього</span>
+                                <span class="stat-value">@(syncResult.NewFiles + syncResult.ReplacedFiles)</span>
+                            </div>
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(syncResult.ErrorMessage))
+                        {
+                            <div class="error-message">
+                                <SvgIcon Type="IconType.Error" Size="16px" />
+                                <span>@syncResult.ErrorMessage</span>
+                            </div>
+                        }
+                    </div>
+                    
+                    @if (syncResult.Results.Any())
+                    {
+                        <div class="sync-details">
+                            <h4>Деталі операцій:</h4>
+                            <div class="results-list">
+                                @foreach (var result in syncResult.Results)
+                                {
+                                    <div class="result-item @(result.Success ? "success" : "error")">
+                                        <div class="result-icon">
+                                            @if (result.Success)
+                                            {
+                                                @if (result.Action == "uploaded")
+                                                {
+                                                    <SvgIcon Type="IconType.Upload" Size="16px" />
+                                                }
+                                                else
+                                                {
+                                                    <SvgIcon Type="IconType.Sync" Size="16px" />
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <SvgIcon Type="IconType.Error" Size="16px" />
+                                            }
+                                        </div>
+                                        <div class="result-info">
+                                            <span class="result-filename">@result.FileName</span>
+                                            <span class="result-action">
+                                                @(result.Action switch {
+                                                    "uploaded" => "Додано",
+                                                    "replaced" => "Замінено",
+                                                    "upload_failed" => "Помилка завантаження",
+                                                    "replace_delete_failed" => "Помилка видалення",
+                                                    "replace_upload_failed" => "Помилка заміни",
+                                                    _ => "Операція"
+                                                })
+                                            </span>
+                                            @if (!string.IsNullOrEmpty(result.Error))
+                                            {
+                                                <span class="result-error">@result.Error</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
                         </div>
                     }
                 </div>
@@ -297,12 +421,139 @@
     private FileResponseDto? selectedFile;
     private string fileContent = "";
     private string editedContent = "";
+    private byte[]? fileBinaryContent;
+    private string? fileDataUri;
     private UserPreferences? userPreferences;
+
+    // Sync related fields
+    private bool showSyncResults = false;
+    private FolderSyncResult? syncResult;
+
+    // Drag and drop related fields
+    private bool isDragOver = false;
+    private ElementReference dragDropZone;
+
+    private DotNetObjectReference<FilesManager>? dotNetRef;
 
     protected override async Task OnInitializedAsync()
     {
+        dotNetRef = DotNetObjectReference.Create(this);
         await LoadPreferences();
         await LoadFiles();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Initialize API configuration for JavaScript
+            await ApiConfigService.InitializeAsync();
+            await SetupDragAndDrop();
+        }
+    }
+
+    private async Task SetupDragAndDrop()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("initializeDragAndDrop", dragDropZone, dotNetRef);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Drag and drop setup failed: {ex.Message}");
+        }
+    }
+
+    [JSInvokable]
+    public void OnDragEnter()
+    {
+        isDragOver = true;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnDragLeave()
+    {
+        isDragOver = false;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public async Task ShowUploadProgress(string message)
+    {
+        await NotificationService.ShowInfoAsync(message);
+    }
+
+    [JSInvokable]
+    public async Task ShowUploadError(string error)
+    {
+        await NotificationService.ShowErrorAsync(error);
+    }
+
+    [JSInvokable]
+    public async Task OnUploadCompleted(JsonElement resultData)
+    {
+        try
+        {
+            var totalFiles = resultData.GetProperty("totalFiles").GetInt32();
+            var successCount = resultData.GetProperty("successCount").GetInt32();
+            var errorCount = resultData.GetProperty("errorCount").GetInt32();
+            
+            // Show summary notification
+            if (errorCount == 0)
+            {
+                await NotificationService.ShowSuccessAsync($"Успішно завантажено {successCount} з {totalFiles} файлів!");
+            }
+            else if (successCount > 0)
+            {
+                await NotificationService.ShowWarningAsync($"Завантажено {successCount} з {totalFiles} файлів. {errorCount} файлів з помилками.");
+            }
+            else
+            {
+                await NotificationService.ShowErrorAsync($"Не вдалося завантажити жоден файл з {totalFiles}.");
+            }
+
+            // Show individual errors if any
+            if (resultData.TryGetProperty("results", out var resultsElement))
+            {
+                foreach (var result in resultsElement.EnumerateArray())
+                {
+                    if (result.TryGetProperty("success", out var successElement) && 
+                        !successElement.GetBoolean() &&
+                        result.TryGetProperty("fileName", out var fileNameElement) &&
+                        result.TryGetProperty("error", out var errorElement))
+                    {
+                        var fileName = fileNameElement.GetString();
+                        var error = errorElement.GetString();
+                        await NotificationService.ShowErrorAsync($"❌ {fileName}: {error}");
+                    }
+                }
+            }
+
+            // Автоматично оновлюємо список файлів якщо є успішні завантаження
+            if (successCount > 0)
+            {
+                await LoadFiles();
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error processing upload results: {ex.Message}");
+            await NotificationService.ShowErrorAsync("Помилка обробки результатів завантаження");
+        }
+    }
+
+    public void Dispose()
+    {
+        dotNetRef?.Dispose();
+    }
+
+    private async Task OnSearchInput(ChangeEventArgs e)
+    {
+        searchQuery = e.Value?.ToString() ?? "";
+        FilterFiles();
+        StateHasChanged();
     }
 
     private async Task LoadPreferences()
@@ -311,8 +562,7 @@
         if (result.IsSuccess)
         {
             userPreferences = result.Value;
-            searchQuery = userPreferences!.SearchQuery;
-            selectedFilter = userPreferences.SelectedFilter;
+            selectedFilter = userPreferences!.SelectedFilter;
             showMetadata = userPreferences.ShowMetadata;
             sortAscending = userPreferences.SortAscending;
         }
@@ -322,7 +572,6 @@
     {
         if (userPreferences != null)
         {
-            userPreferences.SearchQuery = searchQuery;
             userPreferences.SelectedFilter = selectedFilter;
             userPreferences.ShowMetadata = showMetadata;
             userPreferences.SortAscending = sortAscending;
@@ -361,22 +610,25 @@
         var query = searchQuery.ToLower();
         var files = allFiles.AsEnumerable();
 
+        // Пошук по назві файлу
         if (!string.IsNullOrEmpty(query))
         {
             files = files.Where(f => f.OriginalName.ToLower().Contains(query));
         }
 
+        // Фільтр по типу
         var filesList = files.ToList();
         filesList = FileManagerService.FilterFiles(filesList, selectedFilter);
-        filteredFiles = FileManagerService.SortFiles(filesList, "created", sortAscending);
         
-        _ = SavePreferences();
+        // Сортування
+        filteredFiles = FileManagerService.SortFiles(filesList, "created", sortAscending);
     }
 
     private void ToggleSort()
     {
         sortAscending = !sortAscending;
         FilterFiles();
+        _ = SavePreferences();
     }
 
     private void ToggleMetadata()
@@ -388,6 +640,7 @@
     private async Task ApplyFilter()
     {
         FilterFiles();
+        await SavePreferences();
     }
 
     private async Task HandleFileUpload(InputFileChangeEventArgs e)
@@ -398,20 +651,60 @@
         
         if (result.IsSuccess)
         {
-            await NotificationService.ShowSuccessAsync($"{files.Count} файл(ів) успішно завантажено!");
             await LoadFiles();
-        }
-        else
-        {
-            await NotificationService.ShowErrorAsync($"Помилка завантаження: {result.Error?.Message}");
         }
     }
 
-    private async Task SyncFiles()
+    // Replaced old SyncFiles method with new folder sync functionality
+    private async Task SyncWithFolder()
     {
         isSyncing = true;
-        await LoadFiles();
-        isSyncing = false;
+        try
+        {
+            // Check if browser supports folder sync
+            var supportResult = await SyncService.IsFolderSyncSupportedAsync();
+            if (!supportResult.IsSuccess || !supportResult.Value)
+            {
+                await NotificationService.ShowWarningAsync(
+                    "Ваш браузер не підтримує синхронізацію папок. " +
+                    "Використовуйте Chrome 86+ або Edge 86+ для цієї функції. " +
+                    "Поки що скористайтеся звичайним завантаженням файлів.");
+                return;
+            }
+
+            // Perform folder synchronization
+            var result = await SyncService.SynchronizeFolderAsync();
+            
+            if (result.IsSuccess)
+            {
+                syncResult = result.Value!;
+                
+                // Reload files to show updated list
+                await LoadFiles();
+                
+                // Show detailed results if there were operations performed
+                if ((syncResult.NewFiles + syncResult.ReplacedFiles) > 0 || !string.IsNullOrEmpty(syncResult.ErrorMessage))
+                {
+                    showSyncResults = true;
+                }
+                
+                StateHasChanged();
+            }
+            else
+            {
+                await NotificationService.ShowErrorAsync($"Помилка синхронізації: {result.Error?.Message}");
+            }
+        }
+        finally
+        {
+            isSyncing = false;
+        }
+    }
+
+    private void CloseSyncResults()
+    {
+        showSyncResults = false;
+        syncResult = null;
     }
 
     private async Task ViewFile(FileResponseDto file)
@@ -422,32 +715,60 @@
         await LoadFileContent(file.Id);
     }
 
-    private async Task EditFile(FileResponseDto file)
-    {
-        selectedFile = file;
-        isEditMode = true;
-        showFileViewer = true;
-        await LoadFileContent(file.Id);
-    }
-
     private async Task LoadFileContent(string fileId)
     {
         isLoadingContent = true;
         fileContent = "";
         editedContent = "";
+        fileBinaryContent = null;
+        fileDataUri = null;
         
         try
         {
-            var result = await FileManagerService.GetFileContentAsync(fileId);
-            
-            if (result.IsSuccess)
+            // Визначаємо тип файлу
+            if (selectedFile != null)
             {
-                fileContent = result.Value ?? "";
-                editedContent = fileContent;
-            }
-            else
-            {
-                await NotificationService.ShowErrorAsync($"Не вдалося завантажити вміст файлу: {result.Error?.Message}");
+                if (FileManagerService.IsImageFile(selectedFile.OriginalName) || 
+                    FileManagerService.IsPdfFile(selectedFile.OriginalName))
+                {
+                    // Завантажуємо бінарний файл (зображення або PDF)
+                    var binaryResult = await FileManagerService.GetFileBinaryAsync(fileId);
+                    
+                    if (binaryResult.IsSuccess)
+                    {
+                        fileBinaryContent = binaryResult.Value;
+                        
+                        // Створюємо data URI для відображення
+                        if (FileManagerService.IsImageFile(selectedFile.OriginalName))
+                        {
+                            var mimeType = GetImageMimeType(selectedFile.OriginalName);
+                            fileDataUri = $"data:{mimeType};base64,{Convert.ToBase64String(fileBinaryContent!)}";
+                        }
+                        else if (FileManagerService.IsPdfFile(selectedFile.OriginalName))
+                        {
+                            fileDataUri = $"data:application/pdf;base64,{Convert.ToBase64String(fileBinaryContent!)}";
+                        }
+                    }
+                    else
+                    {
+                        await NotificationService.ShowErrorAsync($"Не вдалося завантажити файл: {binaryResult.Error?.Message}");
+                    }
+                }
+                else
+                {
+                    // Завантажуємо текстовий файл
+                    var textResult = await FileManagerService.GetFileContentAsync(fileId);
+                    
+                    if (textResult.IsSuccess)
+                    {
+                        fileContent = textResult.Value ?? "";
+                        editedContent = fileContent;
+                    }
+                    else
+                    {
+                        await NotificationService.ShowErrorAsync($"Не вдалося завантажити вміст файлу: {textResult.Error?.Message}");
+                    }
+                }
             }
         }
         finally
@@ -459,12 +780,6 @@
     private void StartEdit()
     {
         isEditMode = true;
-        editedContent = fileContent;
-    }
-
-    private void CancelEdit()
-    {
-        isEditMode = false;
         editedContent = fileContent;
     }
 
@@ -509,10 +824,17 @@
 
     private void CloseFileViewer()
     {
+        if (isEditMode)
+        {
+            editedContent = fileContent;
+        }
+        
         showFileViewer = false;
         selectedFile = null;
         fileContent = "";
         editedContent = "";
+        fileBinaryContent = null;
+        fileDataUri = null;
         isEditMode = false;
         isLoadingContent = false;
         isSaving = false;
@@ -595,20 +917,20 @@
 
         return @<SvgIcon Type="iconType" Size="32px" />;
     }
-
-    private string FormatFileSize(long bytes)
+    
+    private string GetImageMimeType(string fileName)
     {
-        string[] sizes = { "Б", "КБ", "МБ", "ГБ", "ТБ" };
-        double len = bytes;
-        int order = 0;
-        
-        while (len >= 1024 && order < sizes.Length - 1)
+        var extension = Path.GetExtension(fileName).ToLowerInvariant();
+        return extension switch
         {
-            order++;
-            len = len / 1024;
-        }
-        
-        return $"{len:0.##} {sizes[order]}";
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            ".gif" => "image/gif",
+            ".bmp" => "image/bmp",
+            ".webp" => "image/webp",
+            ".svg" => "image/svg+xml",
+            _ => "image/jpeg" // fallback
+        };
     }
     
     private string GetUserName(string ownerUsername)

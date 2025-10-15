@@ -11,12 +11,15 @@ public interface IFileManagerService
     Task<Result<FileResponseDto>> GetFileAsync(string fileId);
     Task<Result> DeleteFileAsync(string fileId);
     Task<Result<string>> GetFileContentAsync(string fileId);
+    Task<Result<byte[]>> GetFileBinaryAsync(string fileId);
     Task<Result<FileResponseDto>> UpdateFileContentAsync(string fileId, string newContent);
     Task<Result<List<FileResponseDto>>> SearchFilesAsync(string query);
     List<FileResponseDto> FilterFiles(List<FileResponseDto> files, string filter);
     List<FileResponseDto> SortFiles(List<FileResponseDto> files, string sortBy, bool ascending = true);
     bool CanPreviewFile(string fileName);
     bool CanEditFile(string fileName);
+    bool IsImageFile(string fileName);
+    bool IsPdfFile(string fileName);
 }
 
 public class FileManagerService : IFileManagerService
@@ -28,7 +31,9 @@ public class FileManagerService : IFileManagerService
     private static readonly string[] PreviewableExtensions = 
     {
         ".txt", ".md", ".json", ".xml", ".csv", ".log",
-        ".cs", ".js", ".html", ".css", ".py", ".c", ".cpp"
+        ".cs", ".js", ".html", ".css", ".py", ".c", ".cpp",
+        ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg",
+        ".pdf"
     };
 
     // Файли які можна редагувати
@@ -257,6 +262,65 @@ public class FileManagerService : IFileManagerService
         }
     }
 
+    public async Task<Result<byte[]>> GetFileBinaryAsync(string fileId)
+    {
+        try
+        {
+            // Спочатку отримуємо інформацію про файл
+            var fileInfoResult = await GetFileAsync(fileId);
+            if (!fileInfoResult.IsSuccess)
+            {
+                return fileInfoResult.Error!;
+            }
+
+            var fileInfo = fileInfoResult.Value!;
+            if (!IsImageFile(fileInfo.OriginalName) && !IsPdfFile(fileInfo.OriginalName))
+            {
+                return new Error("File.NotBinary", "Цей файл не підтримує бінарний перегляд", ErrorType.Validation);
+            }
+
+            // Отримуємо бінарний вміст файлу через download endpoint
+            var response = await _httpClient.GetAsync($"api/files/{fileId}/download");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsByteArrayAsync();
+                return content;
+            }
+            else
+            {
+                // Обробляємо помилку API
+                try
+                {
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+                    var errorMessage = errorResponse?.Error?.Message ?? $"Помилка сервера: {response.StatusCode}";
+                    await _notificationService.ShowErrorAsync($"Не вдалося отримати файл: {errorMessage}");
+                    return errorResponse?.Error ?? DomainErrors.File.NotFound;
+                }
+                catch
+                {
+                    await _notificationService.ShowErrorAsync($"Помилка отримання файлу: {response.StatusCode}");
+                    return DomainErrors.File.NotFound;
+                }
+            }
+        }
+        catch (HttpRequestException)
+        {
+            await _notificationService.ShowErrorAsync("Помилка мережі при отриманні файлу");
+            return DomainErrors.General.UnexpectedError;
+        }
+        catch (TaskCanceledException)
+        {
+            await _notificationService.ShowErrorAsync("Отримання файлу скасовано");
+            return DomainErrors.General.UnexpectedError;
+        }
+        catch (Exception)
+        {
+            await _notificationService.ShowErrorAsync("Не вдалося отримати файл");
+            return DomainErrors.General.UnexpectedError;
+        }
+    }
+
     public async Task<Result<FileResponseDto>> UpdateFileContentAsync(string fileId, string newContent)
     {
         try
@@ -416,7 +480,9 @@ public class FileManagerService : IFileManagerService
     public bool CanPreviewFile(string fileName)
     {
         var extension = Path.GetExtension(fileName).ToLowerInvariant();
-        return PreviewableExtensions.Contains(extension);
+        return PreviewableExtensions.Contains(extension) || 
+               IsImageFile(fileName) || 
+               IsPdfFile(fileName);
     }
 
     public bool CanEditFile(string fileName)
@@ -425,13 +491,18 @@ public class FileManagerService : IFileManagerService
         return EditableExtensions.Contains(extension);
     }
 
-    // Helper methods
-    private static bool IsImageFile(string fileName)
+    public bool IsImageFile(string fileName)
     {
         var extensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg" };
         return extensions.Contains(Path.GetExtension(fileName).ToLowerInvariant());
     }
 
+    public bool IsPdfFile(string fileName)
+    {
+        return Path.GetExtension(fileName).ToLowerInvariant() == ".pdf";
+    }
+
+    // Helper methods для фільтрації (використовують наші публічні методи)
     private static bool IsCodeFile(string fileName)
     {
         var extensions = new[] { ".py", ".c", ".cpp", ".cs", ".js", ".html", ".css", ".java", ".php", ".rb", ".go", ".ts" };

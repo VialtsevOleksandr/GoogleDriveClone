@@ -6,5 +6,5 @@ public record ApiResponse<T>(bool Success, string Message, T Data);
 
 public record ApiErrorResponse(bool Success, Error Error);
 
-// Для успішних відповідей БЕЗ даних
+// Для простих відповідей без даних
 public record ApiResponse(bool Success, string Message);

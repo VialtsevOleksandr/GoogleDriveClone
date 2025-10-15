@@ -12,7 +12,6 @@ public interface IPreferencesService
 
 public class UserPreferences
 {
-    public string SearchQuery { get; set; } = string.Empty;
     public string SelectedFilter { get; set; } = "all";
     public bool ShowMetadata { get; set; } = true;
     public bool SortAscending { get; set; } = false;

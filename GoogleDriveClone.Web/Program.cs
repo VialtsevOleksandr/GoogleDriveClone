@@ -18,6 +18,21 @@ public class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
+        // Configure SignalR Hub options for larger messages
+        builder.Services.AddSignalR(options =>
+        {
+            // Збільшуємо максимальний розмір повідомлення до 2MB (для текстових файлів до 1MB)
+            options.MaximumReceiveMessageSize = 2 * 1024 * 1024; // 2MB
+            
+            // Збільшуємо таймаути
+            options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+            options.HandshakeTimeout = TimeSpan.FromSeconds(30);
+            options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+            
+            // Включаємо детальні помилки в Development
+            options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+        });
+
         // Отримуємо базову адресу API з конфігурації
         var apiBaseAddress = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7166/";
 

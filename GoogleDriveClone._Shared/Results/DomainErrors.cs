@@ -86,6 +86,64 @@ public static class DomainErrors
             ErrorType.Validation);
     }
 
+    public static class Sync
+    {
+        public static Error CheckSupportFailed { get; } = new(
+            "Sync.CheckSupportFailed",
+            "Помилка перевірки підтримки синхронізації браузером.",
+            ErrorType.Validation);
+
+        public static Error NotSupported { get; } = new(
+            "Sync.NotSupported",
+            "Ваш браузер не підтримує синхронізацію папок. Використовуйте Chrome 86+ або Edge 86+.",
+            ErrorType.Validation);
+
+        public static Error FolderSelectionCancelled { get; } = new(
+            "Sync.FolderSelectionCancelled",
+            "Вибір папки скасовано користувачем.",
+            ErrorType.Validation);
+
+        public static Error FolderSelectionFailed { get; } = new(
+            "Sync.FolderSelectionFailed",
+            "Помилка вибору папки.",
+            ErrorType.Validation);
+
+        public static Error ReadFolderFailed { get; } = new(
+            "Sync.ReadFolderFailed",
+            "Помилка читання файлів з папки.",
+            ErrorType.Validation);
+
+        public static Error ServerFilesFailed { get; } = new(
+            "Sync.ServerFilesFailed",
+            "Не вдалося отримати список файлів з сервера.",
+            ErrorType.Validation);
+
+        public static Error CompareFailed { get; } = new(
+            "Sync.CompareFailed",
+            "Помилка порівняння локальних та серверних файлів.",
+            ErrorType.Validation);
+
+        public static Error ExecutionFailed { get; } = new(
+            "Sync.ExecutionFailed",
+            "Помилка виконання синхронізації.",
+            ErrorType.Validation);
+
+        public static Error CriticalError { get; } = new(
+            "Sync.CriticalError",
+            "Критична помилка синхронізації.",
+            ErrorType.Validation);
+
+        public static Error NoSupportedFiles { get; } = new(
+            "Sync.NoSupportedFiles",
+            "У вибраній папці немає підтримуваних файлів.",
+            ErrorType.Validation);
+
+        public static Error UserCancelled { get; } = new(
+            "Sync.UserCancelled",
+            "Синхронізація скасована користувачем.",
+            ErrorType.Validation);
+    }
+
     public static class General
     {
         public static Error ValidationFailed { get; } = new(

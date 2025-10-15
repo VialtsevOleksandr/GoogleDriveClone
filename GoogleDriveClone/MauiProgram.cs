@@ -6,55 +6,54 @@ using GoogleDriveClone.Shared.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
 
-namespace GoogleDriveClone
-{
-    public static class MauiProgram
-    {
-        public static MauiApp CreateMauiApp()
-        {
-            var builder = MauiApp.CreateBuilder();
-            builder
-                .UseMauiApp<App>()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                });
+namespace GoogleDriveClone;
 
-            builder.Services.AddMauiBlazorWebView();
+public static class MauiProgram
+{
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+            });
+
+        builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
-            builder.Services.AddBlazorWebViewDeveloperTools();
-            builder.Logging.AddDebug();
+        builder.Services.AddBlazorWebViewDeveloperTools();
+        builder.Logging.AddDebug();
 #endif
 
-            // Configure HttpClient for API
-            builder.Services.AddHttpClient<IAuthApiService, AuthApiService>(client =>
-            {
-                client.BaseAddress = new Uri("https://localhost:7166/");
-            });
+        // Базова адреса API (можна винести в конфігурацію пізніше)
+        var apiBaseAddress = "https://localhost:7166/";
 
-            // Configure default HttpClient for other services
-            builder.Services.AddHttpClient("ApiClient", client =>
-            {
-                client.BaseAddress = new Uri("https://localhost:7166/");
-            });
+        // Configure HttpClient for API services
+        builder.Services.AddHttpClient<IAuthApiService, AuthApiService>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseAddress);
+        });
 
-            builder.Services.AddScoped<HttpClient>(provider =>
-                provider.GetRequiredService<IHttpClientFactory>().CreateClient("ApiClient"));
+        // Configure default HttpClient for other services
+        builder.Services.AddHttpClient("ApiClient", client =>
+        {
+            client.BaseAddress = new Uri(apiBaseAddress);
+        });
 
-            // Add LocalStorage
-            builder.Services.AddBlazoredLocalStorage();
+        builder.Services.AddScoped<HttpClient>(provider =>
+            provider.GetRequiredService<IHttpClientFactory>().CreateClient("ApiClient"));
 
-            // Add Authentication
-            builder.Services.AddScoped<CustomAuthenticationStateProvider>();
-            builder.Services.AddScoped<AuthenticationStateProvider>(provider => 
-                provider.GetRequiredService<CustomAuthenticationStateProvider>());
-            builder.Services.AddAuthorizationCore();
+        // Add LocalStorage for MAUI Blazor
+        builder.Services.AddBlazoredLocalStorage();
 
-            // Add Gaming Drive services
-            builder.Services.AddSharedServices();
+        // Add Authorization 
+        builder.Services.AddAuthorizationCore();
 
-            return builder.Build();
-        }
+        // Add all shared services (включає authentication)
+        builder.Services.AddSharedServices();
+
+        return builder.Build();
     }
 }

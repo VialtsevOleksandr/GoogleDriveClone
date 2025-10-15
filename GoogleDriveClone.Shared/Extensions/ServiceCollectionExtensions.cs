@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddSharedServices(this IServiceCollection services)
     {
-        // Authentication services - правильна реєстрація
+        // Authentication services
         services.AddScoped<CustomAuthenticationStateProvider>();
         services.AddScoped<AuthenticationStateProvider>(provider => 
             provider.GetRequiredService<CustomAuthenticationStateProvider>());
@@ -20,7 +20,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IFileManagerService, FileManagerService>();
         services.AddScoped<IFileUploadService, FileUploadService>();
         services.AddScoped<IFileDownloadService, FileDownloadService>();
-        
+        services.AddScoped<ISyncService, SyncService>();
+        services.AddScoped<IApiConfigService, ApiConfigService>();
+
         // User services
         services.AddScoped<IUserStatsService, UserStatsService>();
 
