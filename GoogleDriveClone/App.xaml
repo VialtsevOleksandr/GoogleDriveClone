@@ -6,12 +6,21 @@
     <Application.Resources>
         <ResourceDictionary>
 
-            <Color x:Key="PageBackgroundColor">#512bdf</Color>
+            <Color x:Key="PageBackgroundColor">#6D28D9</Color>
             <Color x:Key="PrimaryTextColor">White</Color>
+            
+            <!-- Menu Colors -->
+            <Color x:Key="MenuBarBackgroundColor">#a0a0a0</Color>
+            <Color x:Key="MenuBarTextColor">#e0e0e0</Color>
+            <Color x:Key="MenuItemHoverColor">#2b0b98</Color>
+            <Color x:Key="MenuItemTextColor">#f5f5f5</Color>
+            <Color x:Key="MenuSeparatorColor">#3d1fa3</Color>
 
             <Style TargetType="Label">
                 <Setter Property="TextColor" Value="{DynamicResource PrimaryTextColor}" />
                 <Setter Property="FontFamily" Value="OpenSansRegular" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Padding" Value="0" />
             </Style>
 
             <Style TargetType="Button">
@@ -20,7 +29,7 @@
                 <Setter Property="BackgroundColor" Value="#2b0b98" />
                 <Setter Property="Padding" Value="14,10" />
             </Style>
-
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

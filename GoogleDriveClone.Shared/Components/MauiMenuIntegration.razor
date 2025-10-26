@@ -1,0 +1,189 @@
+@implements IDisposable
+@inject IJSRuntime JSRuntime
+@inject IServiceProvider ServiceProvider
+
+@code {
+    private GoogleDriveClone.Shared.Services.MauiMenuService? MenuService;
+
+    protected override void OnInitialized()
+    {
+        // Намагаємось отримати сервіс, якщо він зареєстрований (тільки в MAUI)
+        MenuService = ServiceProvider.GetService(typeof(GoogleDriveClone.Shared.Services.MauiMenuService)) 
+                      as GoogleDriveClone.Shared.Services.MauiMenuService;
+        
+        if (MenuService is not null)
+        {
+            // Підписуємося на події з MAUI меню
+            MenuService.UploadFileRequested += OnUploadFileRequested;
+            MenuService.SortAscendingRequested += OnSortAscendingRequested;
+            MenuService.SortDescendingRequested += OnSortDescendingRequested;
+            MenuService.ShowDataRequested += OnShowDataRequested;
+            
+            Console.WriteLine("MauiMenuIntegration: MenuService found and subscribed");
+        }
+        else
+        {
+            Console.WriteLine("MauiMenuIntegration: MenuService not found (running in Web mode)");
+        }
+    }
+
+    private async void OnUploadFileRequested()
+    {
+        try
+        {
+            // Просто клікаємо на кнопку "Завантажити" на сторінці
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                const uploadButton = document.getElementById(""fileUpload"");
+                if (uploadButton) {
+                    uploadButton.click();
+                    console.log('Upload button clicked');
+                } else {
+                    console.error('Upload button not found');
+                }
+            ");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error triggering upload: {ex.Message}");
+        }
+    }
+
+    private async void OnSortAscendingRequested()
+    {
+        try
+        {
+            // Перевіряємо поточне сортування і клікаємо якщо потрібно
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                // Знаходимо всі кнопки control-button
+                const buttons = document.querySelectorAll('.control-button');
+                let sortButton = null;
+                
+                // Шукаємо кнопку з SVG іконками сортування (SortUp/SortDown)
+                for (const btn of buttons) {
+                    const title = btn.getAttribute('title');
+                    if (title && title.includes('Сортування')) {
+                        sortButton = btn;
+                        break;
+                    }
+                }
+                
+                if (sortButton) {
+                    const title = sortButton.getAttribute('title');
+                    console.log('Current sort title:', title);
+                    
+                    // Якщо зараз сортування за спаданням, клікаємо щоб змінити на зростання
+                    if (title.includes('спаданням')) {
+                        sortButton.click();
+                        console.log('Clicked to change to ascending');
+                    } else {
+                        console.log('Already sorted ascending');
+                    }
+                    
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('Сортування: за зростанням дати', 'info', 3000);
+                    }
+                } else {
+                    console.error('Sort button not found');
+                }
+            ");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sorting ascending: {ex.Message}");
+        }
+    }
+
+    private async void OnSortDescendingRequested()
+    {
+        try
+        {
+            // Перевіряємо поточне сортування і клікаємо якщо потрібно
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                // Знаходимо всі кнопки control-button
+                const buttons = document.querySelectorAll('.control-button');
+                let sortButton = null;
+                
+                // Шукаємо кнопку з SVG іконками сортування (SortUp/SortDown)
+                for (const btn of buttons) {
+                    const title = btn.getAttribute('title');
+                    if (title && title.includes('Сортування')) {
+                        sortButton = btn;
+                        break;
+                    }
+                }
+                
+                if (sortButton) {
+                    const title = sortButton.getAttribute('title');
+                    console.log('Current sort title:', title);
+                    
+                    // Якщо зараз сортування за зростанням, клікаємо щоб змінити на спадання
+                    if (title.includes('зростанням')) {
+                        sortButton.click();
+                        console.log('Clicked to change to descending');
+                    } else {
+                        console.log('Already sorted descending');
+                    }
+                    
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('Сортування: за спаданням дати', 'info', 3000);
+                    }
+                } else {
+                    console.error('Sort button not found');
+                }
+            ");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sorting descending: {ex.Message}");
+        }
+    }
+
+    private async void OnShowDataRequested()
+    {
+        try
+        {
+            // Перемикаємо показ метаданих
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                // Знаходимо всі кнопки control-button
+                const buttons = document.querySelectorAll('.control-button');
+                let metadataButton = null;
+                
+                // Шукаємо кнопку з текстом про деталі
+                for (const btn of buttons) {
+                    const title = btn.getAttribute('title');
+                    if (title && title.includes('деталі')) {
+                        metadataButton = btn;
+                        break;
+                    }
+                }
+                
+                if (metadataButton) {
+                    metadataButton.click();
+                    console.log('Metadata button clicked');
+                    
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('Перемикання деталей файлів', 'info', 3000);
+                    }
+                } else {
+                    console.error('Metadata button not found');
+                }
+            ");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error toggling metadata: {ex.Message}");
+        }
+    }
+
+    public void Dispose()
+    {
+        if (MenuService is not null)
+        {
+            // Відписуємося від подій
+            MenuService.UploadFileRequested -= OnUploadFileRequested;
+            MenuService.SortAscendingRequested -= OnSortAscendingRequested;
+            MenuService.SortDescendingRequested -= OnSortDescendingRequested;
+            MenuService.ShowDataRequested -= OnShowDataRequested;
+        }
+    }
+}

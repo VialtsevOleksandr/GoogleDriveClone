@@ -6,6 +6,30 @@
              x:Class="GoogleDriveClone.MainPage"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
 
+    <ContentPage.MenuBarItems>
+        <!-- Файл Menu -->
+        <MenuBarItem Text="Файл">
+            <MenuFlyoutItem Text="Завантажити файл" Clicked="OnUploadFileClicked" />
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem Text="Вихід" Clicked="OnExitClicked" />
+        </MenuBarItem>
+
+        <!-- Вид Menu -->
+        <MenuBarItem Text="Вид">
+            <MenuFlyoutSubItem Text="Сортувати за...">
+                <MenuFlyoutItem Text="Датою створення (зростання)" Clicked="OnSortAscendingClicked" />
+                <MenuFlyoutItem Text="Датою створення (спадання)" Clicked="OnSortDescendingClicked" />
+            </MenuFlyoutSubItem>
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem Text="Показати дані" Clicked="OnShowDataClicked" />
+        </MenuBarItem>
+
+        <!-- Довідка Menu -->
+        <MenuBarItem Text="Довідка">
+            <MenuFlyoutItem Text="Про програму" Clicked="OnAboutClicked" />
+        </MenuBarItem>
+    </ContentPage.MenuBarItems>
+    
     <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
         <BlazorWebView.RootComponents>
             <RootComponent Selector="#app" ComponentType="{x:Type shared:Routes}" />

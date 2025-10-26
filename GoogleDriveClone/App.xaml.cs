@@ -1,15 +1,22 @@
-﻿namespace GoogleDriveClone
-{
-    public partial class App : Application
-    {
-        public App()
-        {
-            InitializeComponent();
-        }
+﻿using GoogleDriveClone.Shared.Services;
 
-        protected override Window CreateWindow(IActivationState? activationState)
+namespace GoogleDriveClone;
+
+public partial class App : Application
+{
+    public App()
+    {
+        InitializeComponent();
+    }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        var menuService = Handler?.MauiContext?.Services.GetService<MauiMenuService>();
+        if (menuService == null)
         {
-            return new Window(new MainPage()) { Title = "GoogleDriveClone" };
+            throw new InvalidOperationException("MauiMenuService не зареєстровано");
         }
+        
+        return new Window(new NavigationPage(new MainPage(menuService))) { Title = "GoogleDriveClone" };
     }
 }

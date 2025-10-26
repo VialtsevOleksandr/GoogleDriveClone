@@ -20,6 +20,9 @@
 
 <PageTitle>Мій диск - Gaming Drive</PageTitle>
 
+<!-- MAUI Menu Integration Component (invisible, just handles events) -->
+<MauiMenuIntegration />
+
 <div class="files-workspace @(isDragOver ? "drag-over" : "")" @ref="dragDropZone">
     <!-- Drag and Drop Overlay -->
     <div class="drag-drop-overlay @(isDragOver ? "active" : "")">
@@ -78,7 +81,7 @@
                 </button>
                 
                 <div class="upload-zone">
-                    <InputFile OnChange="HandleFileUpload" class="upload-input" id="fileUpload" multiple />
+                    <InputFile OnChange="HandleFileUpload" class="upload-input" id="fileUpload" />
                     <label for="fileUpload" class="upload-button">
                         <SvgIcon Type="IconType.Upload" Size="18px" />
                         Завантажити

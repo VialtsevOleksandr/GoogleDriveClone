@@ -54,6 +54,9 @@ public static class MauiProgram
         // Add all shared services (включає authentication)
         builder.Services.AddSharedServices();
 
+        // Add MAUI-specific services
+        builder.Services.AddSingleton<MauiMenuService>();
+
         return builder.Build();
     }
 }
